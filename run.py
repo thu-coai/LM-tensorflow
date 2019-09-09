@@ -43,7 +43,7 @@ def run(*argv):
 
 	parser.add_argument('--lr', type=float, default=1e-2, help='Learning rate. Default: 0.01')
 	parser.add_argument('--dh_size', type=int, default=200, help='Size of decoder GRU')
-	parser.add_argument('--droprate', type=float, default=0, help='The probability to be zerod in dropout. 0 indicates for don\'t use dropout')
+	parser.add_argument('--droprate', type=float, default=0.0, help='The probability to be zerod in dropout. 0 indicates for don\'t use dropout')
 	parser.add_argument('--lr_decay', type=float, default=0.999, help='Learning rate decay. Default: 0.999')
 	parser.add_argument('--batch_size', type=float, default=128, help='Batch size. Default=128')
 	cargs = parser.parse_args(argv)
