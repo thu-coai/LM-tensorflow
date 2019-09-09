@@ -8,7 +8,6 @@ from utils import SummaryHelper
 
 class LMModel(object):
 	def __init__(self, data, args, embed):
-
 		with tf.variable_scope("input"):
 			with tf.variable_scope("embedding"):
 				# build the embedding table and embedding input
@@ -18,14 +17,19 @@ class LMModel(object):
 				else:
 					# initialize the embedding by pre-trained word vectors
 					self.embed = tf.get_variable('embed', dtype=tf.float32, initializer=embed)
-
+			
 			# input
 			self.sentence = tf.placeholder(tf.int32, (None, None), 'sen_inps')  # batch*len
 			self.sentence_length = tf.placeholder(tf.int32, (None,), 'sen_lens')  # batch
 			self.use_prior = tf.placeholder(dtype=tf.bool, name="use_prior")
+			self.keep_prob = tf.placeholder(tf.float32)
+
+			with tf.name_scope("embedding_dropout"):
+   				self.embed = tf.nn.dropout(self.embed, keep_prob=self.keep_prob, noise_shape=[data.vocab_size,1])
 
 			batch_size, batch_len = tf.shape(self.sentence)[0], tf.shape(self.sentence)[1]
 			self.scentence_max_len = batch_len - 1
+			self.args = args
 
 			# data processing
 			LM_input = tf.split(self.sentence, [self.scentence_max_len, 1], 1)[0]  # no eos_id
@@ -43,6 +47,7 @@ class LMModel(object):
 		basic_cell = tf.nn.rnn_cell.LSTMCell(args.dh_size)
 		with tf.variable_scope('rnnlm'):
 			LM_output, _ = dynamic_rnn(basic_cell, self.LM_input, self.input_len, dtype=tf.float32, scope="rnnlm")
+			LM_output = tf.nn.dropout( LM_output, self.keep_prob )
 		# fullly connected layer
 		LM_output = tf.layers.dense(inputs=LM_output, units=data.vocab_size) # shape of LM_output: (batch_size, batch_len-1, vocab_size)
 		
@@ -114,9 +119,16 @@ class LMModel(object):
 		'''
 		run the LM for one step (batch)
 		'''
-		input_feed = {self.sentence: data['sent'],
+		if forward_only:
+			input_feed = {self.sentence: data['sent'],
 					  self.sentence_length: data['sent_length'],
-					  self.use_prior: False}
+					  self.use_prior: False,
+					  self.keep_prob: 1.0}
+		else:
+			input_feed = {self.sentence: data['sent'],
+					  self.sentence_length: data['sent_length'],
+					  self.use_prior: False,
+					  self.keep_prob: self.args.dropout_keep_prob}
 		if forward_only:
 			# test mode
 			output_feed = [self.loss,
@@ -165,7 +177,7 @@ class LMModel(object):
 		ppl_loss_step = 0
 		previous_losses = [1e18] * 5 # previous 5 losses
 		best_valid = 1e18
-
+		self.train = True
 		data.restart("train", batch_size=args.batch_size, shuffle=True)
 		batched_data = data.get_next_batch("train")
 		for epoch_step in range(args.epochs):
@@ -221,6 +233,7 @@ class LMModel(object):
 		data.restart("test", batch_size=args.batch_size, shuffle=False)
 		batched_data = data.get_next_batch("test")
 		results = []
+		self.train = False
 		while batched_data != None:
 			batched_responses_id = self.inference(sess, batched_data)[0]
 			gen_prob = self.step_LM(sess, batched_data, forward_only=True)[1]

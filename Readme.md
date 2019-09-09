@@ -185,27 +185,25 @@ A man is standing on a dog on a laptop .
 
 ## Experiment
 
----
-
 ### Subset Experiment
 
 This is based on ```MSCOCO_small```( a smaller version of ```MSCOCO```), we did the following experiments:
 
 | learning rate | learning rate decay | batch size | dh size | dropout    rate | dev-perplexity | test-perplexity |
 | ------------- | ------------------- | ---------- | ------- | --------------- | -------------- | --------------- |
-| 1e-2          | 0.999               | 128        | 200     | 0               | 14.16          | 14.06           |
-| 5e-3          | 0.999               | 128        | 200     | 0               | 14.37          | 14.19           |
-| 5e-2          | 0.999               | 128        | 200     | 0               | N/A            | N/A             |
-| 1e-2          | 0.999               | 128        | 150     | 0.5             | 14.73          | 14.62           |
-| 1e-2          | 0.999               | 128        | 200     | 0.5             | 14.37          | 14.23           |
 | 1e-2          | 0.999               | 128        | 250     | 0.3             | 14.08          | 13.93           |
-| 1e-2          | 0.999               | 128        | 300     | 0.5             | 14.35          | 14.15           |
-| 1e-2          | 0.999               | 128        | 250     | 0.6             | 18.2           | 18.04           |
-| 1e-2          | 0.999               | 128        | 200     | 0.3             | 15.73          | 15.46           |
+| 1e-2          | 0.999               | 128        | **200** | **0**           | 14.16          | 14.06           |
+| **5e-3**      | 0.999               | 128        | **200** | **0**           | 14.37          | 14.19           |
+| **5e-2**      | 0.999               | 128        | **200** | **0**           | N/A            | N/A             |
+| 1e-2          | 0.999               | 128        | **150** | **0.5**         | 14.73          | 14.62           |
+| 1e-2          | 0.999               | 128        | **200** | **0.5**         | 14.37          | 14.23           |
+| 1e-2          | 0.999               | 128        | **300** | **0.5**         | 14.35          | 14.15           |
+| 1e-2          | 0.999               | 128        | 250     | **0.6**         | 18.2           | 18.04           |
+| 1e-2          | 0.999               | 128        | **200** | 0.3             | 15.73          | 15.46           |
 
-To assign a specific parameter, you should follow the guidance in the 'Argument' part. For example, to reproduce the first experiment, you can change the parameter value in ```run.py``` and run the following command:
+To assign a specific parameter, you should follow the guidance in the 'Argument' part. For example, to reproduce the first experiment, you can run the following command:
 
-```python3 run.py --datapath="resources://MSCOCO_small"```
+```python3 run.py --datapath="resources://MSCOCO_small" --lr 1e-2 --dh_size 250 --droprate 0.3```
 
 
 
