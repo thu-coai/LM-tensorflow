@@ -128,7 +128,7 @@ class LMModel(object):
 			input_feed = {self.sentence: data['sent'],
 					  self.sentence_length: data['sent_length'],
 					  self.use_prior: False,
-					  self.keep_prob: self.args.dropout_keep_prob}
+					  self.keep_prob: (float)(self.args.dropout_keep_prob) }
 		if forward_only:
 			# test mode
 			output_feed = [self.loss,
