@@ -144,7 +144,8 @@ class LMModel(object):
 
 	def inference(self, session, data):
 		input_feed = {self.sentence: data['sent'],
-					  self.sentence_length: data['sent_length']}
+					  self.sentence_length: data['sent_length'],
+					  self.keep_prob:1.0}
 		output_feed = [self.generation_index]
 		return session.run(output_feed, input_feed)
 
