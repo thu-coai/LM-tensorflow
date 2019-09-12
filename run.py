@@ -19,8 +19,8 @@ def run(*argv):
 		help='Dataloader class. Default: MSCOCO')
 	parser.add_argument('--datapath', type=str, default='MSCOCO',
 		help='Directory for data set. Default: MSCOCO')
-	parser.add_argument('--epoch', type=int, default=10,
-		help="Epoch for trainning. Default: 10")
+	parser.add_argument('--epoch', type=int, default=4000,
+		help="Epoch for trainning. Default: 4000")
 	parser.add_argument('--wvclass', type=str, default='Glove',
 		help="Wordvector class, None for using Glove pretrained wordvec. Default: Glove")
 	parser.add_argument('--wvpath', type=str, default="resources://Glove300d",
@@ -40,6 +40,12 @@ def run(*argv):
 		help='Enter debug mode (using ptvsd).')
 	parser.add_argument('--cache', action='store_true',
 		help='Use cache for speeding up load data and wordvec. (It may cause problems when you switch dataset.)')
+
+	parser.add_argument('--lr', type=float, default=1e-2, help='Learning rate. Default: 0.01')
+	parser.add_argument('--dh_size', type=int, default=200, help='Size of decoder GRU')
+	parser.add_argument('--droprate', type=float, default=0.0, help='The probability to be zerod in dropout. 0 indicates for don\'t use dropout')
+	parser.add_argument('--lr_decay', type=float, default=0.999, help='Learning rate decay. Default: 0.999')
+	parser.add_argument('--batch_size', type=int, default=128, help='Batch size. Default=128')
 	cargs = parser.parse_args(argv)
 
 	# Editing following arguments to bypass command line.
@@ -61,16 +67,18 @@ def run(*argv):
 
 	args.softmax_samples = 512
 	args.embedding_size = 300
-	args.dh_size = 200
-	args.lr = 1e-1
-	args.lr_decay = 0.995
+	args.dh_size = cargs.dh_size
+	args.lr = cargs.lr
+	args.lr_decay = cargs.lr_decay
 	args.momentum = 0.9
-	args.batch_size = 128
+	args.batch_size = cargs.batch_size
 	args.grad_clip = 5.0
 	args.show_sample = [0]
 	args.max_sent_length = 50
 	args.checkpoint_steps = 1000
 	args.checkpoint_max_to_keep = 5
+	args.dropout_keep_prob = 1 - cargs.droprate
+
 
 	import random
 	random.seed(0)
